@@ -131,3 +131,67 @@ resource "aws_alb_listener" "myapp" {
     type = "forward"
   }
 }
+
+###
+#VPC
+resource "aws_vpc" "main" {
+  cidr_block = "10.100.200.0/24"
+}
+
+
+#VPC ENDPOINT
+
+
+#NLB
+resource "aws_lb" "test" {
+  name               = "test-lb-tf"
+  internal           = true
+  load_balancer_type = "network"
+  subnets            = [aws_subnet.subnet_1.id, aws_subnet.subnet_2.id]
+}
+
+# lambda
+resource "aws_iam_role" "iam_for_lambda" {
+  name = "iam_for_lambda"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_lambda_function" "test_lambda" {
+  filename      = "populate_NLB_TG_with_ALB.zip"
+  function_name = "populate"
+  role          = aws_iam_role.iam_for_lambda.arn
+  handler       = "populate_NLB_TG_with_ALB.lambda_handler"
+
+  source_code_hash = filebase64sha256("lambda_function_payload.zip")
+  timeout          = 300
+
+  # VPC?
+  runtime = "python2.7"
+
+  environment {
+    variables = {
+      ALB_DNS_NAME = "bar"
+      NLB_TG_ARN = ""
+      S3_BUCKET = ""
+      MAX_LOOKUP_PER_INVOCATION  = ""
+      INVOCATIONS_BEFORE_DEREGISTRATION = ""
+      CW_METRIC_FLAG_IP_COUNT = ""
+      ALB_LISTENER = ""
+    }
+  }
+}
