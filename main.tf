@@ -47,6 +47,7 @@ module "nlb" {
 resource "aws_vpc_endpoint_service" "privatelink" {
   acceptance_required        = false
   network_load_balancer_arns = [module.nlb.nlb_arn]
+  #checkov:skip=CKV_AWS_123:For this demo I don't need to configure the VPC Endpoint Service for Manual Acceptance
 }
 
 module "ec2_instance" {
@@ -62,10 +63,13 @@ module "ec2_instance" {
 }
 
 resource "aws_security_group" "ssh_sg" {
-  vpc_id = module.network.vpc_id
+  vpc_id      = module.network.vpc_id
+  description = "Allow SSH from anywhere"
+
   ingress {
-    from_port   = 22
-    to_port     = 22
+    from_port = 22
+    to_port   = 22
+    #checkov:skip=CKV_AWS_24:For this demo I do allow SSH from anywhere
     cidr_blocks = ["0.0.0.0/0"]
     protocol    = "tcp"
     description = "Allow SSH"
@@ -131,10 +135,13 @@ module "ec2_instance_addeds" {
 }
 
 resource "aws_security_group" "ssh_sg_added" {
-  vpc_id = module.network_added.vpc_id
+  vpc_id      = module.network_added.vpc_id
+  description = "Allow SSH from anywhere"
+
   ingress {
-    from_port   = 22
-    to_port     = 22
+    from_port = 22
+    to_port   = 22
+    #checkov:skip=CKV_AWS_24:For this demo I do allow SSH from anywhere
     cidr_blocks = ["0.0.0.0/0"]
     protocol    = "tcp"
     description = "Allow SSH"

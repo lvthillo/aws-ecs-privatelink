@@ -1,4 +1,5 @@
 resource "aws_ecs_cluster" "ecs_cluster" {
+  #checkov:skip=CKV_AWS_65:For this demo I don't need container insights enabled
   name = var.ecs_cluster_name
 }
 

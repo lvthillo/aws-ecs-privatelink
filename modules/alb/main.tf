@@ -4,6 +4,11 @@ resource "aws_lb" "aws_alb" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
   subnets            = var.alb_subnets
+  #checkov:skip=CKV_AWS_91:For this demo I don't need access logging enabled
+  #checkov:skip=CKV_AWS_150:For this demo I don't need ELB deletion protection
+  #checkov:skip=CKV_AWS_152:For this demo I don't need cross zone load balancing enabled
+  enable_deletion_protection = false
+  drop_invalid_header_fields = true
 }
 
 resource "aws_security_group" "alb_sg" {

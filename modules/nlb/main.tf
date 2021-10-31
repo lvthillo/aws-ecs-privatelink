@@ -3,6 +3,10 @@ resource "aws_lb" "aws_nlb" {
   internal           = true
   load_balancer_type = "network"
   subnets            = var.nlb_subnets
+  #checkov:skip=CKV_AWS_91:For this demo I don't need access logging enabled
+  #checkov:skip=CKV_AWS_150:For this demo I don't need ELB deletion protection
+  #checkov:skip=CKV_AWS_152:For this demo I don't need cross zone load balancing enabled
+  enable_deletion_protection = false
 }
 
 resource "aws_lb_target_group" "nlb_tg" {
