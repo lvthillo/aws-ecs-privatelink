@@ -81,14 +81,6 @@ resource "aws_security_group" "vpce_sg" {
     protocol    = "tcp"
     description = "Allow communication to PrivateLink endpoint"
   }
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    cidr_blocks = [var.vpc_added]
-    protocol    = "tcp"
-    description = "Allow communication to PrivateLink endpoint"
-  }
 }
 
 module "ec2_instance_added" {
