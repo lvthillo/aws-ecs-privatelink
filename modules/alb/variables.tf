@@ -26,9 +26,9 @@ variable "vpc_id" {
   type        = string
 }
 
-variable "nlb_subnets_cidrs" {
-  description = "Subnets in which NLB is deployed"
-  type        = list(string)
+variable "vpc_cidr" {
+  description = "VPC CIDR"
+  type        = string
 }
 
 variable "default_vpc_sg" {

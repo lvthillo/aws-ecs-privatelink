@@ -34,3 +34,7 @@ variable "alb_arn" {
   description = "ALB ARN"
   type        = string
 }
+
+variable "alb_listener" {
+  description = "ALB Listener"
+}

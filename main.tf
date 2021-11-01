@@ -16,23 +16,23 @@ module "ecs" {
   source               = "./modules/ecs"
   ecs_subnets          = module.network.private_subnets
   ecs_container_name   = "demo"
-  ecs_port             = var.ecs_port // we use networkMode awsvpc so host and container ports should match
+  ecs_port             = var.ecs_port # we use networkMode awsvpc so host and container ports should match
   ecs_task_def_name    = "demo-task"
-  ecs_docker_image     = "lvthillo/python-flask-docker"
+  ecs_docker_image     = "lvthillo/python-flask-api"
   vpc_id               = module.network.vpc_id
   alb_sg               = module.alb.alb_sg
   alb_target_group_arn = module.alb.alb_tg_arn
 }
 
 module "alb" {
-  source            = "./modules/alb"
-  alb_subnets       = module.network.private_subnets
-  vpc_id            = module.network.vpc_id
-  ecs_sg            = module.ecs.ecs_sg
-  alb_port          = var.alb_port
-  ecs_port          = var.ecs_port
-  default_vpc_sg    = module.network.default_vpc_sg
-  nlb_subnets_cidrs = [var.vpc] #[var.priv_sub_1a, var.priv_sub_1b]
+  source         = "./modules/alb"
+  alb_subnets    = module.network.private_subnets
+  vpc_id         = module.network.vpc_id
+  ecs_sg         = module.ecs.ecs_sg
+  alb_port       = var.alb_port
+  ecs_port       = var.ecs_port
+  default_vpc_sg = module.network.default_vpc_sg
+  vpc_cidr       = var.vpc # Allow inbound client traffic via AWS PrivateLink on the load balancer listener port
 }
 
 module "nlb" {
@@ -42,45 +42,14 @@ module "nlb" {
   alb_port    = var.alb_port
   alb_arn     = module.alb.alb_arn
   nlb_port    = var.nlb_port
+  # Used in depends_on (see: https://github.com/aws/aws-cdk/issues/17208)
+  alb_listener = module.alb.alb_listener
 }
 
 resource "aws_vpc_endpoint_service" "privatelink" {
   acceptance_required        = false
   network_load_balancer_arns = [module.nlb.nlb_arn]
   #checkov:skip=CKV_AWS_123:For this demo I don't need to configure the VPC Endpoint Service for Manual Acceptance
-}
-
-module "ec2_instance" {
-  source                      = "terraform-aws-modules/ec2-instance/aws"
-  version                     = "~> 3.0"
-  name                        = "test-instance-vpc-1"
-  associate_public_ip_address = true
-  ami                         = "ami-05cd35b907b4ffe77" # eu-west-1 specific
-  instance_type               = "t2.micro"
-  key_name                    = var.key
-  vpc_security_group_ids      = [aws_security_group.ssh_sg.id]
-  subnet_id                   = element(module.network.public_subnets, 0)
-}
-
-resource "aws_security_group" "ssh_sg" {
-  vpc_id      = module.network.vpc_id
-  description = "Allow SSH from anywhere"
-
-  ingress {
-    from_port = 22
-    to_port   = 22
-    #checkov:skip=CKV_AWS_24:For this demo I do allow SSH from anywhere
-    cidr_blocks = ["0.0.0.0/0"]
-    protocol    = "tcp"
-    description = "Allow SSH"
-  }
-  egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
 }
 
 ### Deploy of Second (added) VPC which will use VPCE and Privatelink to connect
@@ -122,7 +91,7 @@ resource "aws_security_group" "vpce_sg" {
   }
 }
 
-module "ec2_instance_addeds" {
+module "ec2_instance_added" {
   source                      = "terraform-aws-modules/ec2-instance/aws"
   version                     = "~> 3.0"
   name                        = "test-instance-vpc-2"

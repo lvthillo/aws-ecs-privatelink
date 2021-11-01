@@ -17,3 +17,10 @@ output "alb_dns_name" {
   value       = aws_lb.aws_alb.dns_name
   description = "The ALB DNS name"
 }
+
+# See https://github.com/aws/aws-cdk/issues/17208
+# Will use it in depends_on in nlb_tg_attachment
+output "alb_listener" {
+  value       = aws_alb_listener.alb_listener
+  description = "The ALB listener"
+}

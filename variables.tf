@@ -7,7 +7,7 @@ variable "ecs_port" {
 variable "alb_port" {
   description = "Port of ALB"
   type        = number
-  default     = 80
+  default     = 8888
 }
 
 variable "nlb_port" {

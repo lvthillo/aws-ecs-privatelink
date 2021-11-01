@@ -21,6 +21,9 @@ resource "aws_lb_target_group_attachment" "nlb_tg_attachment" {
   target_group_arn = aws_lb_target_group.nlb_tg.arn
   target_id        = var.alb_arn
   port             = var.alb_port
+  depends_on = [
+    var.alb_listener,
+  ]
 }
 
 resource "aws_lb_listener" "nlb_listener" {

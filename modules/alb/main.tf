@@ -24,9 +24,8 @@ resource "aws_security_group_rule" "ingress" {
   to_port           = var.alb_port
   protocol          = "tcp"
   security_group_id = aws_security_group.alb_sg.id
-  // workaround: NLB has no security group so we need to whitelist the CIDR's in which the NLB is deployed
-  // in a production environment you can put your NLB in separate subnets to restrict access to only the NLB's
-  cidr_blocks = var.nlb_subnets_cidrs //private subnet1 and private subnet2
+  //NLB has no security group so we will whitelist the VPC CIDR cidr_blocks = var.vpc_cidr
+  cidr_blocks = [var.vpc_cidr]
 }
 
 resource "aws_security_group_rule" "egress" {
@@ -41,7 +40,7 @@ resource "aws_security_group_rule" "egress" {
 
 resource "aws_lb_target_group" "alb_tg" {
   name        = var.alb_tg_name
-  port        = var.alb_port
+  port        = var.ecs_port
   protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = var.vpc_id
