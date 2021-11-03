@@ -20,7 +20,7 @@ output "alb_dns_name" {
 
 # See https://github.com/aws/aws-cdk/issues/17208
 # Will use it in depends_on in nlb_tg_attachment
-output "alb_listener" {
-  value       = aws_alb_listener.alb_listener
-  description = "The ALB listener"
+output "alb_listener_port" {
+  value       = aws_alb_listener.alb_listener.port
+  description = "The ALB listener port"
 }

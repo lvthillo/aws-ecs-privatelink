@@ -36,14 +36,12 @@ module "alb" {
 }
 
 module "nlb" {
-  source      = "./modules/nlb"
-  nlb_subnets = module.network.private_subnets
-  vpc_id      = module.network.vpc_id
-  alb_port    = var.alb_port
-  alb_arn     = module.alb.alb_arn
-  nlb_port    = var.nlb_port
-  # Used in depends_on (see: https://github.com/aws/aws-cdk/issues/17208)
-  alb_listener = module.alb.alb_listener
+  source            = "./modules/nlb"
+  nlb_subnets       = module.network.private_subnets
+  vpc_id            = module.network.vpc_id
+  alb_arn           = module.alb.alb_arn
+  nlb_port          = var.nlb_port
+  alb_listener_port = module.alb.alb_listener_port
 }
 
 resource "aws_vpc_endpoint_service" "privatelink" {

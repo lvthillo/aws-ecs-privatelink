@@ -25,16 +25,11 @@ variable "nlb_port" {
   type        = number
 }
 
-variable "alb_port" {
-  description = "ALB port"
-  type        = number
-}
-
 variable "alb_arn" {
   description = "ALB ARN"
   type        = string
 }
 
-variable "alb_listener" {
-  description = "ALB Listener"
+variable "alb_listener_port" {
+  description = "ALB Listener port"
 }
